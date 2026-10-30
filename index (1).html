@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rally</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0b1a;--card:#1a1530;--ink:#f3f0ff;--mute:#9d95c4;--line:#2d2650;--hot:#c6ff3d;--pink:#ff3d9a;--on-hot:#14102a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f6f3ff;--card:#fff;--ink:#1b1536;--mute:#6a6290;--line:#ddd6f5;--hot:#6a1fe0;--pink:#d1157a;--on-hot:#fff}}
+:root[data-theme="light"]{--bg:#f6f3ff;--card:#fff;--ink:#1b1536;--mute:#6a6290;--line:#ddd6f5;--hot:#6a1fe0;--pink:#d1157a;--on-hot:#fff}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.45 system-ui,-apple-system,sans-serif}
+.wrap{max-width:520px;margin:0 auto;padding:16px 14px 60px}
+h1{font:800 44px/1 'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-2px;margin:0}
+h1 i{color:var(--hot);font-style:normal}
+h2{font:700 20px 'Bricolage Grotesque',system-ui,sans-serif;margin:22px 0 10px}
+.top{display:flex;justify-content:space-between;align-items:flex-end}
+.live{font-size:13px;font-weight:700;color:var(--hot);display:flex;align-items:center;gap:6px}
+.live b{width:9px;height:9px;border-radius:50%;background:var(--pink);animation:p 1.4s infinite}
+@keyframes p{50%{opacity:.25}}@media(prefers-reduced-motion:reduce){.live b{animation:none}}
+.demo{font-size:12px;color:var(--mute);margin:6px 0 0}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:12px 0 4px;scrollbar-width:none}
+.chip{flex:none;padding:7px 14px;border:1.5px solid var(--line);border-radius:99px;background:none;color:var(--ink);font:600 14px system-ui;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--hot);color:var(--on-hot);border-color:var(--hot)}
+select{background:var(--card);color:var(--ink);border:1.5px solid var(--line);padding:8px;border-radius:8px;font:500 14px system-ui;margin-top:6px}
+button:focus-visible,select:focus-visible{outline:3px solid var(--hot);outline-offset:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px}
+.hd{display:flex;justify-content:space-between;gap:10px;width:100%;background:none;border:0;color:inherit;text-align:left;padding:0;cursor:pointer;font:inherit}
+.nm{font:700 18px 'Bricolage Grotesque',system-ui,sans-serif}.sub{font-size:13px;color:var(--mute)}
+.score{font:800 30px/1 'Bricolage Grotesque',system-ui,sans-serif;text-align:right}.score small{display:block;font:600 11px system-ui;color:var(--mute)}
+.meter{height:8px;background:var(--line);border-radius:9px;margin:10px 0;overflow:hidden}.meter i{display:block;height:100%;background:linear-gradient(90deg,var(--hot),var(--pink));transition:width .6s}
+.tags{display:flex;gap:6px;flex-wrap:wrap}.tag{font-size:12px;font-weight:600;padding:3px 9px;border-radius:99px;background:var(--line)}.tag.p{background:var(--pink);color:#fff}
+.rep{border-top:1px solid var(--line);margin-top:12px;padding-top:10px}
+.rep p{margin:8px 0 4px;font-size:13px;font-weight:700;color:var(--mute)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.b{padding:8px 12px;border-radius:8px;border:1.5px solid var(--hot);background:none;color:var(--ink);font:600 14px system-ui;cursor:pointer}.b:active{background:var(--hot);color:var(--on-hot)}
+.feed{list-style:none;margin:0;padding:0}.feed li{padding:10px 0;border-top:1px solid var(--line);display:flex;gap:10px}.feed li:first-child{border:0}
+.feed time{flex:none;width:56px;font-size:12px;color:var(--mute);padding-top:2px}
+.tag.d{background:none;border:1px dashed var(--mute);color:var(--mute)}a{color:var(--hot)}.safe{font-size:13px;color:var(--mute);margin-top:26px;border-left:4px solid var(--pink);padding-left:10px}
+</style></head><body><div class="wrap">
+<div class="top"><h1>rally<i>.</i></h1><div class="live"><b></b><span id="clk"></span></div></div>
+<p class="demo">Real Boston and Cambridge venues. Crowd and line info comes only from reports, and starts empty. Your reports show on this device for now.</p>
+<div class="chips" id="chips" role="group" aria-label="Venue type"></div>
+<div class="sub" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><select id="city" aria-label="City"><option value="any">Boston + Cambridge</option><option>Cambridge</option><option>Boston</option></select><select id="age" aria-label="Age"><option value="any">All spots</option><option value="u21">Open to under 21 (check venue)</option></select><label><input type="checkbox" id="demo"> Demo mode</label></div>
+<h2>Hot right now</h2><div id="list"></div>
+<h2>Live feed</h2><ul class="feed" id="feed"></ul>
+<p class="safe">Heading out? Tell a friend where you're going, keep your phone charged, and plan your ride home before you start. Drinking age is 21 in the US. Check hours and age rules with each venue before you go.</p>
+</div>
+<script>
+const D=[['Russell House Tavern','Bar','Harvard Sq','14 John F. Kennedy St, Cambridge, MA','21+'],['Grendel\'s Den','Bar','Harvard Sq','89 Winthrop St, Cambridge, MA','21+'],['Wusong Road','Bar','Harvard Sq','112 Mt Auburn St, Cambridge, MA','21+'],['The Plough and Stars','Bar','Central Sq','912 Massachusetts Ave, Cambridge, MA','21+'],['Brick & Mortar','Bar','Central Sq','567 Massachusetts Ave, Cambridge, MA','21+'],['Roxy\'s Arcade','Chill','Central Sq','292 Massachusetts Ave, Cambridge, MA','Varies'],['The Sinclair','Live music','Harvard Sq','52 Church St, Cambridge, MA','Varies'],['Club Passim','Live music','Harvard Sq','47 Palmer St, Cambridge, MA','Varies'],['The Lilypad','Live music','Inman Sq','1353 Cambridge St, Cambridge, MA','Varies'],['Sonia','Live music','Central Sq','10 Brookline St, Cambridge, MA','Varies'],['51 Nightclub','Club','Theater District','51 Stuart St, Boston, MA','21+'],['Royale','Club','Theater District','279 Tremont St, Boston, MA','Varies'],['The Grand Boston','Club','Seaport','58 Seaport Blvd, Boston, MA','21+'],['Rooftop at The Envoy','Rooftop','Seaport','70 Sleeper St, Boston, MA','21+'],['Deck 12','Rooftop','Seaport','65 Seaport Blvd, Boston, MA','Varies'],['Apex Rooftop Bar','Rooftop','Financial District','150 State St, Boston, MA','21+'],['Game On!','Bar','Fenway','82 Lansdowne St, Boston, MA','Varies'],['Brighton Music Hall','Live music','Allston','158 Brighton Ave, Allston, MA','Varies'],['VERSUS','Chill','Downtown','42 Province St, Boston, MA','21+'],['Kings Dining & Entertainment','Chill','Back Bay','50 Dalton St, Boston, MA','All ages']];
+const V=D.map((d,i)=>({id:i,n:d[0],t:d[1],h:d[2],ad:d[3],a:d[4],c:null,w:0,g:[],u:0,demo:false,city:d[3].includes('Cambridge')?'Cambridge':'Boston'}));
+let F='All',A='any',C='any',open=null,feed=[],demoOn=false,simT=null;
+const STALE=90*60000,cl=(x,a=0,b=100)=>Math.max(a,Math.min(b,x)),$=s=>document.querySelector(s),
+heat=v=>v.u&&Date.now()-v.u<STALE&&v.c!=null?cl(Math.round(v.c*.7+(45+v.g.length*10)*.3-v.w*.5)):null,
+lab=h=>h==null?'No recent reports':h>=75?'On fire':h>=55?'Busy':h>=35?'Warming up':'Quiet',
+ago=t=>{const m=Math.floor((Date.now()-t)/60000);return m<1?'Just now':m+'m ago'};
+function post(v,msg,you,demo){feed.unshift({t:Date.now(),v:v.n,msg,you,demo});feed=feed.slice(0,30)}
+const show=v=>(F==='All'||v.t===F)&&(C==='any'||v.city===C)&&(A==='any'||v.a!=='21+');
+function render(){
+$('#chips').innerHTML=['All','Bar','Club','Rooftop','Live music','Chill'].map(c=>`<button class="chip" aria-pressed="${F===c}" data-f="${c}">${c}</button>`).join('');
+const L=V.filter(show).sort((a,b)=>(heat(b)??-1)-(heat(a)??-1)||a.n.localeCompare(b.n));
+$('#list').innerHTML=L.length?L.map(v=>{const h=heat(v),o=open===v.id;
+return `<div class="card"><button class="hd" data-o="${v.id}" aria-expanded="${o}"><span><span class="nm">${v.n}</span><br><span class="sub">${v.t} · ${v.h} · ${v.a}</span></span><span class="score">${h??'–'}<small>${lab(h)}</small></span></button>
+<div class="meter"><i style="width:${h||0}%"></i></div>
+<div class="tags">${h!=null?`<span class="tag p">${v.w?'~'+v.w+' min line':'No line'}</span>`:''}${v.g.map(x=>`<span class="tag">${x}</span>`).join('')}${h!=null&&v.demo?'<span class="tag d">Demo</span>':''}${h!=null?`<span class="tag">${ago(v.u)}</span>`:''}</div>
+${o?`<div class="rep"><p class="sub"><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.n+' '+v.ad)}" target="_blank" rel="noopener">${v.ad} · Directions</a></p><p>How's the crowd?</p><div class="row">${[['Dead',10],['Chill',35],['Busy',65],['Packed',90]].map(x=>`<button class="b" data-r="c|${v.id}|${x[0]}|${x[1]}">${x[0]}</button>`).join('')}</div>
+<p>How long is the line?</p><div class="row">${[['No line',0],['About 10 min',10],['About 20 min',20],['30+ min',35]].map(x=>`<button class="b" data-r="w|${v.id}|${x[0]}|${x[1]}">${x[0]}</button>`).join('')}</div>
+<p>What's going on?</p><div class="row">${['DJ on','Live band','Dance floor','Karaoke','Trivia','Happy hour'].map(x=>`<button class="b" data-r="g|${v.id}|${x}|0">${x}</button>`).join('')}</div></div>`:''}</div>`}).join(''):'<p class="sub">No spots match those filters.</p>';
+$('#feed').innerHTML=feed.map(f=>`<li><time>${ago(f.t)}</time><span><b>${f.v}</b>: ${f.msg}${f.you?' <span class="tag p">You</span>':''}${f.demo?' <span class="tag d">Demo</span>':''}</span></li>`).join('')||'<li class="sub">No reports yet. Tap a venue and tell people what you see.</li>'}
+document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;const d=t.dataset;
+if(d.f){F=d.f}else if(d.o){open=open==d.o?null:+d.o}else if(d.r){const[k,id,lb,n]=d.r.split('|'),v=V[+id];v.demo=false;v.u=Date.now();if(v.c==null)v.c=35;
+if(k==='c'){v.c=+n;post(v,'Crowd is '+lb.toLowerCase(),1)}else if(k==='w'){v.w=+n;post(v,lb==='No line'?'No line right now':'Line is '+lb.toLowerCase(),1)}else{if(!v.g.includes(lb)){v.g.unshift(lb);v.g=v.g.slice(0,3)}post(v,lb,1)}}
+render()});
+$('#age').onchange=e=>{A=e.target.value;render()};$('#city').onchange=e=>{C=e.target.value;render()};
+function sim(){const v=V[Math.floor(Math.random()*V.length)];if(!v.u||v.demo){v.demo=true;v.u=Date.now()}else return;
+const r=Math.random();v.c=cl((v.c??40)+(Math.random()<.5?15:-15),5,95);
+if(r<.5){v.w=Math.random()<.5?0:[10,20,35][Math.floor(Math.random()*3)];post(v,v.w?'Line is about '+v.w+' min':'No line right now',0,1)}else post(v,v.c>60?'Crowd is picking up':'Quiet so far',0,1);render()}
+$('#demo').onchange=e=>{demoOn=e.target.checked;clearInterval(simT);if(demoOn){for(let i=0;i<4;i++)sim();simT=setInterval(sim,5000)}else{V.forEach(v=>{if(v.demo){v.c=null;v.w=0;v.g=[];v.u=0;v.demo=false}});feed=feed.filter(f=>!f.demo);render()}};
+const tick=()=>{$('#clk').textContent='LIVE · '+new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})};
+tick();setInterval(tick,15000);setInterval(render,30000);render();
+</script></body></html>
